@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patterned Sphere with Three.js</title>
+    <title>Globe with Country Borders</title>
     <style>
         body { margin: 0; }
         canvas { display: block; }
@@ -11,6 +11,7 @@
 </head>
 <body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.1.0/topojson.min.js"></script>
     <script>
         // Create scene, camera, and renderer
         const scene = new THREE.Scene();
@@ -19,15 +20,37 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // Add sphere
-        const geometry = new THREE.SphereGeometry(5, 32, 32);
-        const material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
-        const sphere = new THREE.Mesh(geometry, material);
-        scene.add(sphere);
+        // Load world map texture
+        const textureLoader = new THREE.TextureLoader();
+        const worldTexture = textureLoader.load('https://threejs.org/examples/textures/land_ocean_ice_cloud_2048.jpg');
 
-        // Add grid helper for latitude and longitude lines
-        const gridHelper = new THREE.GridHelper(10, 10);
-        scene.add(gridHelper);
+        // Create globe geometry and apply texture
+        const geometry = new THREE.SphereGeometry(5, 32, 32);
+        const material = new THREE.MeshBasicMaterial({ map: worldTexture });
+        const globe = new THREE.Mesh(geometry, material);
+        scene.add(globe);
+
+        // Load world country borders data
+        fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
+            .then(response => response.json())
+            .then(data => {
+                // Convert TopoJSON to GeoJSON
+                const countries = topojson.feature(data, data.objects.countries);
+
+                // Loop through each country and draw its border
+                countries.features.forEach(country => {
+                    const borderGeometry = new THREE.Geometry();
+                    country.geometry.coordinates.forEach(polygon => {
+                        polygon.forEach(point => {
+                            const [x, y] = point;
+                            borderGeometry.vertices.push(new THREE.Vector3(x, y, 0));
+                        });
+                    });
+
+                    const border = new THREE.Line(borderGeometry, new THREE.LineBasicMaterial({ color: 0xff0000 }));
+                    globe.add(border);
+                });
+            });
 
         // Set camera position
         camera.position.z = 10;
@@ -35,8 +58,7 @@
         // Add animation loop
         function animate() {
             requestAnimationFrame(animate);
-            sphere.rotation.x += 0.01;
-            sphere.rotation.y += 0.01;
+            globe.rotation.y += 0.01;
             renderer.render(scene, camera);
         }
         animate();
