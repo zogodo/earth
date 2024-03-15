@@ -55,10 +55,49 @@
         // Set camera position
         camera.position.z = 10;
 
+        // Add mouse drag controls
+        let isDragging = false;
+        let previousMousePosition = {
+            x: 0,
+            y: 0
+        };
+        renderer.domElement.addEventListener('mousedown', event => {
+            isDragging = true;
+        });
+        renderer.domElement.addEventListener('mousemove', event => {
+            const deltaMove = {
+                x: event.offsetX - previousMousePosition.x,
+                y: event.offsetY - previousMousePosition.y
+            };
+
+            if (isDragging) {
+                const deltaRotationQuaternion = new THREE.Quaternion()
+                    .setFromEuler(new THREE.Euler(
+                        toRadians(deltaMove.y * 1),
+                        toRadians(deltaMove.x * 1),
+                        0,
+                        'XYZ'
+                    ));
+
+                globe.quaternion.multiplyQuaternions(deltaRotationQuaternion, globe.quaternion);
+            }
+
+            previousMousePosition = {
+                x: event.offsetX,
+                y: event.offsetY
+            };
+        });
+        renderer.domElement.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        function toRadians(angle) {
+            return angle * (Math.PI / 180);
+        }
+
         // Add animation loop
         function animate() {
             requestAnimationFrame(animate);
-            globe.rotation.y += 0.01;
             renderer.render(scene, camera);
         }
         animate();
