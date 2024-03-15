@@ -112,14 +112,21 @@
             isRightClicking = false;
         });
 
+        // Handle mouse wheel event for zooming
+        renderer.domElement.addEventListener('wheel', event => {
+            camera.position.z += event.deltaY * 0.01;
+            camera.position.z = Math.max(5, camera.position.z);
+            camera.position.z = Math.min(50, camera.position.z);
+        });
+
         function toRadians(angle) {
             return angle * (Math.PI / 180);
         }
 
         // Reset vertical rotation
         function resetVerticalRotation() {
-            // globe.quaternion.set(0, 0, 0, 1);
-            globe.rotation.x = 0;
+            globe.quaternion.set(0, 0, 0, 1);
+            // globe.rotation.x = 0;
         }
 
         // Add animation loop
