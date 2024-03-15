@@ -66,7 +66,6 @@
         };
         let isRightClicking = false;
         renderer.domElement.addEventListener('mousedown', event => {
-            event.preventDefault(); // Prevent default right-click menu
             if (event.button === 2) {
                 isRightClicking = true;
             } else if (event.button === 1) {
