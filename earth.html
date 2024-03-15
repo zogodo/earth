@@ -115,7 +115,8 @@
 
         // Reset vertical rotation
         function resetVerticalRotation() {
-            globe.quaternion.set(0, 0, 0, 1);
+            // globe.quaternion.set(0, 0, 0, 1);
+            globe.rotation.x = 0;
         }
 
         // Add animation loop
