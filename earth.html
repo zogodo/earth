@@ -11,8 +11,11 @@
 </head>
 <body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.1.0/topojson.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
     <script>
+        document.addEventListener('contextmenu', function(event) {
+            event.preventDefault(); // Prevent default right-click menu
+        });
         // Create scene, camera, and renderer
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -63,6 +66,7 @@
         };
         let isRightClicking = false;
         renderer.domElement.addEventListener('mousedown', event => {
+            event.preventDefault(); // Prevent default right-click menu
             if (event.button === 2) {
                 isRightClicking = true;
             } else if (event.button === 1) {
